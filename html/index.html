@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      // Prevent forms from submitting.
+      function preventFormSubmit() {
+        var forms = document.querySelectorAll('form');
+        for (var i = 0; i < forms.length; i++) {
+          forms[i].addEventListener('submit', function (event) {
+            event.preventDefault();
+          });
+        }
+      }
+      window.addEventListener('load', preventFormSubmit);
+      function onSuccess(result) {
+        google.script.host.close();
+      }
+      function onFailure(e) {
+        alert(e.message + '\n\n' + e.stack);
+      }
+      function handleFormSubmit(formObject, mode) {
+        switch (mode) {
+          case 'init':
+            google.script.run
+              .withSuccessHandler(onSuccess)
+              .withFailureHandler(onFailure)
+              .init(formObject);
+            break;
+          case 'run':
+            google.script.run
+              .withSuccessHandler(onSuccess)
+              .withFailureHandler(onFailure)
+              .run(formObject);
+            break;
+          default:
+            alert('Unknown mode: ' + mode);
+        }
+      }
+    </script>
+    <?!= include('css'); ?>
+  </head>
+  <body>
+    <? var config = getConfig(); ?>
+    <? var scriptID = ScriptApp.getScriptId(); ?>
+    <form id="myForm" onsubmit="handleFormSubmit(this, '<?= mode ?>')">
+      <fieldset>
+        <div class="row">
+          <label for="callbackUrl"
+            ><?= getMessage("label_callbackUrl") ?></label
+          >
+          <input
+            id="callbackUrl"
+            type="text"
+            name="callbackUrl"
+            value="https://script.google.com/macros/d/<?= scriptID ?>/usercallback"
+            readonly
+          />
+        </div>
+        <div class="row">
+          <label for="clientId"><?= getMessage("label_clientId") ?></label>
+          <input
+            id="clientId"
+            type="text"
+            name="clientId"
+            value="<?= config.clientId ?>"
+          />
+        </div>
+        <div class="row">
+          <label for="clientSecret"
+            ><?= getMessage("label_clientSecret") ?></label
+          >
+          <input
+            id="clientSecret"
+            type="text"
+            name="clientSecret"
+            value="<?= config.clientSecret ?>"
+          />
+        </div>
+        <div class="button-area">
+          <input
+            type="submit"
+            class="button"
+            value="<?= getMessage('button_save') ?>"
+          />
+        </div>
+      </fieldset>
+    </form>
+  </body>
+</html>
