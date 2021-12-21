@@ -2,8 +2,8 @@ import {Locale} from './datas';
 
 const messages: {[key: string]: {[locale: string]: string}} = {
   scriptName: {
-    en: 'feeee invoice app',
-    ja: 'freee 請求書アプリ',
+    en: 'get invoices',
+    ja: '請求書取得',
   },
   title_init: {
     en: 'Setup config',
@@ -15,15 +15,15 @@ const messages: {[key: string]: {[locale: string]: string}} = {
   },
   menu_step0: {
     en: 'STEP0: Setup Config',
-    ja: 'STEP0: freeeアプリ設定',
+    ja: 'STEP0: アプリ設定',
   },
   menu_step1: {
     en: 'STEP1: Authorization',
-    ja: 'STEP1: freeeアプリ ログイン',
+    ja: 'STEP1: ログイン',
   },
   menu_step2: {
     en: 'STEP2: Confirm Connected',
-    ja: 'STEP2: freeeアプリ接続確認',
+    ja: 'STEP2: 接続確認',
   },
   menu_step3: {
     en: 'STEP3: Get Invoices',
@@ -31,7 +31,7 @@ const messages: {[key: string]: {[locale: string]: string}} = {
   },
   menu_step99: {
     en: 'STEP99: Logout',
-    ja: 'STEP99: freeeアプリ ログアウト',
+    ja: 'STEP99: ログアウト',
   },
   label_clientId: {
     en: 'Client ID',
@@ -55,7 +55,7 @@ const messages: {[key: string]: {[locale: string]: string}} = {
   },
   complete_init: {
     en: 'Setup complete',
-    ja: 'freeeアプリの設定が完了しました',
+    ja: '設定が完了しました',
   },
   progress_collect: {
     en: 'Collecting data...',
@@ -72,42 +72,42 @@ export const Message = {
   PROGRESS_INIT_BEGIN: (locale: Locale): string => {
     const msg = {
       en: 'Started initialize app',
-      ja: `freeeアプリの設定を開始しました...`,
+      ja: 'freeeアプリの設定を開始しました...',
     };
     return msg[locale];
   },
   PROGRESS_RUN_BEGIN: (locale: Locale): string => {
     const msg = {
       en: 'Started get invoices',
-      ja: `請求書の取得を開始しました...`,
+      ja: '請求書の取得を開始しました...',
     };
     return msg[locale];
   },
   CLIENT_ID_REQUIRED: (locale: Locale): string => {
     const msg = {
-      en: `Clinet ID is required`,
-      ja: `Client IDを入力してください`,
+      en: 'Clinet ID is required',
+      ja: 'Client IDを入力してください',
     };
     return msg[locale];
   },
   CLIENT_SECRET_REQUIRED: (locale: Locale): string => {
     const msg = {
-      en: `Client Secret is required`,
-      ja: `Client Secretを入力してください`,
+      en: 'Client Secret is required',
+      ja: 'Client Secretを入力してください',
     };
     return msg[locale];
   },
   COMPANY_ID_NOT_FOUND: (locale: Locale): string => {
     const msg = {
-      en: `No company id found`,
-      ja: `事業所IDが見つかりません`,
+      en: 'No company id found',
+      ja: '事業所IDが見つかりません',
     };
     return msg[locale];
   },
   AUTHENTICATE_FAILED: (locale: Locale): string => {
     const msg = {
-      en: `Authentication failed`,
-      ja: `認証に失敗しました`,
+      en: 'Authentication failed',
+      ja: '認証に失敗しました',
     };
     return msg[locale];
   },
@@ -127,8 +127,8 @@ export const Message = {
   },
   INVALID_ROW_LENGTH: (locale: Locale): string => {
     const msg = {
-      en: `There is no data on the sheet.`,
-      ja: `シート上にデータが存在しません。`,
+      en: 'There is no data on the sheet.',
+      ja: 'シート上にデータが存在しません。',
     };
     return msg[locale];
   },

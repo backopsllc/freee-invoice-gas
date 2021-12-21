@@ -6,6 +6,10 @@ export interface SpreadSheetService {
   getUserLocale: () => Locale;
   getUserProperty: (key: string) => string;
   setUserProperty: (key: string, value: string) => void;
+  getSheet: (
+    spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet,
+    sheetName: string
+  ) => GoogleAppsScript.Spreadsheet.Sheet;
   getRange: (
     sheet: GoogleAppsScript.Spreadsheet.Sheet,
     column: number,
@@ -44,6 +48,19 @@ export class SpreadSheetServiceImpl implements SpreadSheetService {
       PROPERTY_PREFIX + key,
       value
     );
+  }
+
+  public getSheet(
+    spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet,
+    sheetName: string
+  ): GoogleAppsScript.Spreadsheet.Sheet {
+    let sheet = spreadSheet.getSheetByName(sheetName);
+    if (sheet) {
+      return sheet;
+    }
+    sheet = spreadSheet.insertSheet();
+    sheet.setName(sheetName);
+    return sheet;
   }
 
   public getRange(

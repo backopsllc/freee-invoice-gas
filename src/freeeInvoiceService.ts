@@ -5,7 +5,30 @@ import {Message} from './resource';
 import {SpreadSheetService} from './SpreadSheetService';
 
 const SEARCH_CONDITION_SHEET = '検索条件';
-const INVOICE_LIST_SHEET = '請求書一覧';
+const COMPANIES_SHEET = '事業所一覧';
+const INVOICES_SHEET = '請求書';
+const COMPANIES_HEADER = ['事業所ID', '事業所名', 'ユーザの権限'];
+const INVOCIES_HEADER = [
+  '売上計上日',
+  '請求書ID',
+  '取引ID',
+  '請求先名',
+  '合計額',
+  '消費税額',
+  '備考',
+  '請求書URL',
+  '取引URL',
+];
+const INVOICES_PARAMS = [
+  'company_id',
+  'start_issue_date',
+  'end_issue_date',
+  'start_due_date',
+  'end_due_date',
+  'limit',
+  'payment_status',
+  'invoice_status',
+];
 
 const getOAuth2Service = (property: UserProperty) => {
   return OAuth2.createService('freeeAPI')
@@ -53,32 +76,35 @@ export const freeeInvoiceService = (
     showMessage(Message.PROGRESS_RUN_BEGIN(locale), spreadSheetService);
 
     const spreadSheet = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = spreadSheet.getSheetByName(SEARCH_CONDITION_SHEET);
-    const sheetInvoices = spreadSheet.getSheetByName(INVOICE_LIST_SHEET);
-    if (!sheet || !sheetInvoices) {
+    const sheetSearch = spreadSheet.getSheetByName(SEARCH_CONDITION_SHEET);
+    if (!sheetSearch) {
       return;
     }
 
-    const queries2D = sheet.getRange('D2:D9').getValues();
+    const queries2D = sheetSearch.getRange('D2:D9').getValues();
     const queries1D = queries2D.flat();
+    let company_ids: string[] = [];
     const parameters: string[] = [];
-    const paramName = [
-      'company_id',
-      'start_issue_date',
-      'end_issue_date',
-      'start_due_date',
-      'end_due_date',
-      'limit',
-      'payment_status',
-      'invoice_status',
-    ];
     queries1D.forEach((value, index) => {
-      if (paramName.length > index) {
+      // eslint-disable-next-line eqeqeq
+      if (index == 0) {
+        if (typeof value === 'string') {
+          company_ids = value.split(',');
+        } else {
+          company_ids.push(value);
+        }
+      } else if (INVOICES_PARAMS.length > index) {
         if (typeof value !== 'string' || value !== '') {
-          parameters.push(`${paramName[index]}=${value}`);
+          parameters.push(`${INVOICES_PARAMS[index]}=${value}`);
         }
       }
     });
+
+    const sheetCompanies = spreadSheetService.getSheet(
+      spreadSheet,
+      COMPANIES_SHEET
+    );
+    const companiesInfo = sheetCompanies.getDataRange().getValues();
 
     const config = getUserProperties(spreadSheetService);
     const oauth2Service = getOAuth2Service(config);
@@ -90,45 +116,49 @@ export const freeeInvoiceService = (
       getMessage('progress_collect', spreadSheetService),
       spreadSheetService
     );
-    const invoices = client.getInvoices(parameters);
 
-    const ary2D: any[][] = [
-      [
-        '売上計上日',
-        '請求書ID',
-        '取引ID',
-        '請求先名',
-        '合計額',
-        '消費税額',
-        '備考',
-        '請求書URL',
-        '取引URL',
-      ],
-    ];
+    company_ids.forEach(company_id => {
+      let companyName = INVOICES_SHEET + company_id;
+      companiesInfo.forEach(row => {
+        // eslint-disable-next-line eqeqeq
+        if (row[0] == company_id && row[1]) {
+          companyName = row[1];
+        }
+      });
+      const sheetInvoices = spreadSheetService.getSheet(
+        spreadSheet,
+        companyName
+      );
 
-    invoices.forEach(invoice => {
-      const urlInvoice = `https://secure.freee.co.jp/docs_v2/invoice/${invoice.id}/edit`;
-      const urlDeal = `https://secure.freee.co.jp/deals#deal_id=${invoice.deal_id}`;
-      ary2D.push([
-        invoice.booking_date,
-        invoice.id,
-        invoice.deal_id,
-        invoice.partner_display_name,
-        invoice.total_amount,
-        invoice.total_vat,
-        invoice.description,
-        urlInvoice,
-        urlDeal,
-      ]);
+      const params = [`${INVOICES_PARAMS[0]}=${company_id}`].concat(parameters);
+      const invoices = client.getInvoices(params);
+
+      const ary2D: any[][] = [INVOCIES_HEADER];
+      invoices.forEach(invoice => {
+        const urlInvoice = `https://secure.freee.co.jp/docs_v2/invoice/${invoice.id}/edit`;
+        const urlDeal = `https://secure.freee.co.jp/deals#deal_id=${invoice.deal_id}`;
+        ary2D.push([
+          invoice.booking_date,
+          invoice.id,
+          invoice.deal_id,
+          invoice.partner_display_name,
+          invoice.total_amount,
+          invoice.total_vat,
+          invoice.description,
+          urlInvoice,
+          urlDeal,
+        ]);
+      });
+      sheetInvoices.getDataRange().clearContent();
+      const rangeData = sheetInvoices.getRange(
+        1,
+        1,
+        ary2D.length,
+        ary2D[0].length
+      );
+      rangeData.setValues(ary2D);
     });
-    sheetInvoices.getDataRange().clearContent();
-    const rangeData = sheetInvoices.getRange(
-      1,
-      1,
-      ary2D.length,
-      ary2D[0].length
-    );
-    rangeData.setValues(ary2D);
+
     showMessage(
       getMessage('scriptName', spreadSheetService) +
         getMessage('progress_end', spreadSheetService),
@@ -145,17 +175,21 @@ export const freeeInvoiceService = (
       oauth2Service.getAccessToken()
     );
     const me = client.getMe();
-    let displayName = me.display_name;
-    const companies = me.companies;
-    if (companies) {
-      const companyIds = companies
-        .map(e => {
-          return e.display_name + ': ' + e.id;
-        })
-        .join('<br />');
-      displayName = displayName + '<br />事業所一覧<br />' + companyIds;
+
+    if (me.companies) {
+      const spreadSheet = SpreadsheetApp.getActiveSpreadsheet();
+      const sheet = spreadSheetService.getSheet(spreadSheet, COMPANIES_SHEET);
+      sheet.getDataRange().clearContent();
+
+      const ary2D: any[][] = [COMPANIES_HEADER];
+      me.companies.forEach(company => {
+        ary2D.push([company.id, company.display_name, company.role]);
+      });
+      const rangeData = sheet.getRange(1, 1, ary2D.length, ary2D[0].length);
+      rangeData.setValues(ary2D);
     }
-    return displayName;
+
+    return me.display_name;
   },
   getMessage: (key: string): string => getMessage(key, spreadSheetService),
 });
