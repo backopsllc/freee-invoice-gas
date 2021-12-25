@@ -41,7 +41,6 @@ export class HttpClient implements Http {
   }
 
   private toJson(response: GoogleAppsScript.URL_Fetch.HTTPResponse): JSON {
-    console.log('getContentText = ' + response.getContentText());
     return JSON.parse(response.getContentText());
   }
 }

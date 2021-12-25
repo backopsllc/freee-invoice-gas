@@ -6,6 +6,28 @@ const SCRIPT_VERSION = 'v1.0.0';
 
 const service = freeeInvoiceService(new SpreadSheetServiceImpl());
 
+const getOAuth2Service = (property: UserProperty) => {
+  return OAuth2.createService('freeeAPI')
+    .setAuthorizationBaseUrl(
+      'https://accounts.secure.freee.co.jp/public_api/authorize'
+    )
+    .setTokenUrl('https://accounts.secure.freee.co.jp/public_api/token')
+    .setClientId(property.clientId)
+    .setClientSecret(property.clientSecret)
+    .setCallbackFunction('authCallback')
+    .setPropertyStore(PropertiesService.getUserProperties());
+};
+const authCallback = function (request: object) {
+  const property = service.getUserProperties();
+  const oauth2Service = getOAuth2Service(property);
+  const isAuthorized = oauth2Service.handleCallback(request);
+  if (isAuthorized) {
+    return HtmlService.createHtmlOutput('成功! このタブを閉じてください');
+  } else {
+    return HtmlService.createHtmlOutput('失敗! このタブを閉じてください');
+  }
+};
+
 const onOpen = function () {
   SpreadsheetApp.getUi()
     .createMenu('freee')
@@ -31,7 +53,8 @@ const init = function (property: UserProperty) {
 };
 
 const auth_d = function () {
-  const oauth2Service = service.getOAuth2Service();
+  const property = service.getUserProperties();
+  const oauth2Service = getOAuth2Service(property);
   if (!oauth2Service.hasAccess()) {
     const authorizationUrl = oauth2Service.getAuthorizationUrl();
     const template = HtmlService.createTemplate(
@@ -48,18 +71,10 @@ const auth_d = function () {
     user_info_d();
   }
 };
-const authCallback = function (request: object) {
-  const oauth2Service = service.getOAuth2Service();
-  const isAuthorized = oauth2Service.handleCallback(request);
-  if (isAuthorized) {
-    return HtmlService.createHtmlOutput('成功! このタブを閉じてください');
-  } else {
-    return HtmlService.createHtmlOutput('失敗! このタブを閉じてください');
-  }
-};
 
 const logout_d = function () {
-  const oauth2Service = service.getOAuth2Service();
+  const property = service.getUserProperties();
+  const oauth2Service = getOAuth2Service(property);
   oauth2Service.reset();
   const mes = 'freeeアプリからログアウトしました';
   const logoutTitle = 'ログアウト終了';
@@ -68,7 +83,9 @@ const logout_d = function () {
 };
 
 const user_info_d = function () {
-  const displayName = service.getDisplayname();
+  const property = service.getUserProperties();
+  const oauth2Service = getOAuth2Service(property);
+  const displayName = service.getDisplayname(oauth2Service);
   const page = 'ユーザー名: ' + displayName;
   const title = 'freee連携済';
 
@@ -76,11 +93,15 @@ const user_info_d = function () {
 };
 
 const run = function () {
-  service.run();
+  const property = service.getUserProperties();
+  const oauth2Service = getOAuth2Service(property);
+  service.run(oauth2Service);
 };
 
 const run_cron = function () {
-  service.run();
+  const property = service.getUserProperties();
+  const oauth2Service = getOAuth2Service(property);
+  service.run(oauth2Service);
 };
 
 const getConfig = function (): UserProperty {

@@ -1,14 +1,9 @@
-import {
-  Companies,
-  Company,
-  User,
-  Invoice,
-  Invoices,
-  isCompanies,
-  isInvoices,
-  isMe,
-  Me,
-} from './datas';
+import {Companies, isCompanies} from './freee-api/Companies';
+import {Company} from './freee-api/Company';
+import {Invoice} from './freee-api/Invoice';
+import {Invoices, isInvoices} from './freee-api/Invoices';
+import {isMe, Me} from './freee-api/Me';
+import {User} from './freee-api/User';
 import {Http} from './Http';
 
 export interface freeeClient {
@@ -24,6 +19,7 @@ export class freeeClientImpl implements freeeClient {
     this.http = http;
     this.accessToken = accessToken;
   }
+
   public getMe(): User {
     const json = this.http.getWithAccessToken(
       this.buildUri('users/me?companies=true&advisor=true'),
@@ -34,6 +30,7 @@ export class freeeClientImpl implements freeeClient {
     }
     return (json as unknown as Me).user;
   }
+
   public getCompanies(): Company[] {
     const json = this.http.getWithAccessToken(
       this.buildUri('companies'),
@@ -44,6 +41,7 @@ export class freeeClientImpl implements freeeClient {
     }
     return (json as unknown as Companies).companies;
   }
+
   public getInvoices(parameters: string[]): Invoice[] {
     const json = this.http.getWithAccessToken(
       this.buildUri('invoices?' + parameters.join('&')),
@@ -54,6 +52,7 @@ export class freeeClientImpl implements freeeClient {
     }
     return (json as unknown as Invoices).invoices;
   }
+
   private buildUri(resource: string): string {
     return `https://api.freee.co.jp/api/1/${resource}`;
   }

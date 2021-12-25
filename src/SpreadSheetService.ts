@@ -6,20 +6,20 @@ export interface SpreadSheetService {
   getUserLocale: () => Locale;
   getUserProperty: (key: string) => string;
   setUserProperty: (key: string, value: string) => void;
-  getSheet: (
-    spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet,
-    sheetName: string
-  ) => GoogleAppsScript.Spreadsheet.Sheet;
+  getSheetByName: (sheetName: string) => GoogleAppsScript.Spreadsheet.Sheet;
+  clearSheet: (sheet: GoogleAppsScript.Spreadsheet.Sheet) => void;
   getRange: (
     sheet: GoogleAppsScript.Spreadsheet.Sheet,
-    column: number,
-    row: number
+    row?: number,
+    column?: number,
+    numRows?: number,
+    numColms?: number
   ) => GoogleAppsScript.Spreadsheet.Range;
-  setColumnWidth: (
-    sheet: GoogleAppsScript.Spreadsheet.Sheet,
-    column: number,
-    width: number
-  ) => void;
+  getValues: (range: GoogleAppsScript.Spreadsheet.Range) => any[][];
+  setValues: (
+    range: GoogleAppsScript.Spreadsheet.Range,
+    values: any[][]
+  ) => GoogleAppsScript.Spreadsheet.Range;
   showMessage: (title: string, message: string) => void;
 }
 
@@ -38,24 +38,20 @@ export class SpreadSheetServiceImpl implements SpreadSheetService {
       PropertiesService.getUserProperties().getProperty(
         PROPERTY_PREFIX + key
       ) || '';
-    console.log(key + ': ' + value);
     return value;
   }
 
   public setUserProperty(key: string, value: string): void {
-    console.log(key + ': ' + value);
     PropertiesService.getUserProperties().setProperty(
       PROPERTY_PREFIX + key,
       value
     );
   }
 
-  public getSheet(
-    spreadSheet: GoogleAppsScript.Spreadsheet.Spreadsheet,
-    sheetName: string
-  ): GoogleAppsScript.Spreadsheet.Sheet {
+  public getSheetByName(sheetName: string): GoogleAppsScript.Spreadsheet.Sheet {
+    const spreadSheet = SpreadsheetApp.getActiveSpreadsheet();
     let sheet = spreadSheet.getSheetByName(sheetName);
-    if (sheet) {
+    if (sheet !== null) {
       return sheet;
     }
     sheet = spreadSheet.insertSheet();
@@ -63,20 +59,35 @@ export class SpreadSheetServiceImpl implements SpreadSheetService {
     return sheet;
   }
 
-  public getRange(
-    sheet: GoogleAppsScript.Spreadsheet.Sheet,
-    column: number,
-    row: number
-  ): GoogleAppsScript.Spreadsheet.Range {
-    return sheet.getRange(row, column);
+  public clearSheet(sheet: GoogleAppsScript.Spreadsheet.Sheet): void {
+    sheet.getDataRange().clearContent();
   }
 
-  public setColumnWidth(
+  public getRange(
     sheet: GoogleAppsScript.Spreadsheet.Sheet,
-    column: number,
-    width: number
-  ): void {
-    sheet.setColumnWidth(column, width);
+    row?: number,
+    column?: number,
+    numRows?: number,
+    numColms?: number
+  ): GoogleAppsScript.Spreadsheet.Range {
+    if (row && column && numRows && numColms) {
+      return sheet.getRange(row, column, numRows, numColms);
+    }
+    if (row && column) {
+      return sheet.getRange(row, column);
+    }
+    return sheet.getDataRange();
+  }
+
+  public getValues(range: GoogleAppsScript.Spreadsheet.Range): any[][] {
+    return range.getValues();
+  }
+
+  public setValues(
+    range: GoogleAppsScript.Spreadsheet.Range,
+    values: any[][]
+  ): GoogleAppsScript.Spreadsheet.Range {
+    return range.setValues(values);
   }
 
   public showMessage(title: string, message: string): void {
