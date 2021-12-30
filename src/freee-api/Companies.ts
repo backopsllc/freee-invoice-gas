@@ -5,7 +5,8 @@ export interface Companies {
 }
 
 export const isCompanies = (arg: any): arg is Companies => {
-  if (arg === undefined || arg === null) return false;
+  // eslint-disable-next-line eqeqeq
+  if (arg == null) return false;
   if ('companies' in arg) {
     const companies = arg.companies;
     return Array.isArray(companies) && companies.every(e => isCompany(e));

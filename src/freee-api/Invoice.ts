@@ -72,7 +72,8 @@ export interface Invoice {
 }
 
 export const isInvoice = (arg: any): arg is Invoice => {
-  if (arg === undefined || arg === null) return false;
+  // eslint-disable-next-line eqeqeq
+  if (arg == null) return false;
   if (
     'id' in arg &&
     'company_id' in arg &&

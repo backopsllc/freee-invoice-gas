@@ -1,4 +1,4 @@
-import {greeter, testGreeter} from '../src/hello';
+import {greeter, testGreeter} from '../hello';
 
 describe('test.ts test', () => {
   beforeAll(() => {

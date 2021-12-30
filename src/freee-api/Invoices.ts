@@ -5,7 +5,8 @@ export interface Invoices {
 }
 
 export const isInvoices = (arg: any): arg is Invoices => {
-  if (arg === undefined || arg === null) return false;
+  // eslint-disable-next-line eqeqeq
+  if (arg == null) return false;
   if ('invoices' in arg) {
     const invoices = arg.invoices;
     return Array.isArray(invoices) && invoices.every(e => isInvoice(e));

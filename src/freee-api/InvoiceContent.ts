@@ -1,8 +1,8 @@
 import {Invoice} from './Invoice';
 
 export interface InvoiceContent {
-  readonly id: string;
-  readonly order: string;
+  readonly id: number;
+  readonly order: number;
   readonly type: string;
   readonly qty: number;
   readonly unit: string;
@@ -29,7 +29,8 @@ export interface InvoiceContent {
 }
 
 export const isInvoiceContent = (arg: any): arg is Invoice => {
-  if (arg === undefined || arg === null) return false;
+  // eslint-disable-next-line eqeqeq
+  if (arg == null) return false;
   if (
     'id' in arg &&
     'order' in arg &&
@@ -64,8 +65,8 @@ export const isInvoiceContent = (arg: any): arg is Invoice => {
 };
 
 export const InvoiceContent = (
-  id: string,
-  order: string,
+  id: number,
+  order: number,
   type: string,
   qty: number,
   unit: string,

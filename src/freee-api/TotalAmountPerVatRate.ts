@@ -8,7 +8,8 @@ export interface TotalAmountPerVatRate {
 export const isTotalAmountPerVatRate = (
   arg: any
 ): arg is TotalAmountPerVatRate => {
-  if (arg === undefined || arg === null) return false;
+  // eslint-disable-next-line eqeqeq
+  if (arg == null) return false;
   if (
     'vat_5' in arg &&
     'vat_8' in arg &&

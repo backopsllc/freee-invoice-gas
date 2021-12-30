@@ -12,7 +12,8 @@ export interface User {
 }
 
 export const isUser = (arg: any): arg is User => {
-  if (arg === undefined || arg === null) return false;
+  // eslint-disable-next-line eqeqeq
+  if (arg == null) return false;
   if ('id' in arg && 'email' in arg) {
     if ('companies' in arg) {
       const companies = arg.companies;

@@ -22,9 +22,13 @@ const authCallback = function (request: object) {
   const oauth2Service = getOAuth2Service(property);
   const isAuthorized = oauth2Service.handleCallback(request);
   if (isAuthorized) {
-    return HtmlService.createHtmlOutput('成功! このタブを閉じてください');
+    return HtmlService.createHtmlOutput(
+      '成功! freeeにログインしました。<br>続行するには、このウィンドウを閉じてSpreadsheetに戻ってください。'
+    );
   } else {
-    return HtmlService.createHtmlOutput('失敗! このタブを閉じてください');
+    return HtmlService.createHtmlOutput(
+      '失敗!  freeeへのログインに失敗しました。<br>このウィンドウを閉じてSpreadsheetに戻ってください。'
+    );
   }
 };
 

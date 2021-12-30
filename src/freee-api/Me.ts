@@ -5,7 +5,8 @@ export interface Me {
 }
 
 export const isMe = (arg: any): arg is Me => {
-  if (arg === undefined || arg === null) return false;
+  // eslint-disable-next-line eqeqeq
+  if (arg == null) return false;
   if ('user' in arg) {
     const user = arg.user;
     return isUser(user);
@@ -13,4 +14,4 @@ export const isMe = (arg: any): arg is Me => {
   return false;
 };
 
-export const Me = (me: User) => ({me});
+export const Me = (user: User) => ({user});
