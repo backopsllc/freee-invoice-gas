@@ -9,7 +9,7 @@
     "deploy": "clasp push",
     "pretest": "npm run lint",
     "test": "jest",
-    "posttest": "npm run fix",
+    "posttest": "npm run compile",
     "lint": "gts lint",
     "fix": "gts fix",
     "compile": "tsc --pretty --noEmitOnError",
@@ -21,7 +21,7 @@
   "lint-staged": {
     "*.@(ts|tsx)": [
       "npm test",
-      "npm run compile"
+      "npm run fix"
     ]
   },
   "keywords": [],
