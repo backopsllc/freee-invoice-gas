@@ -9,7 +9,7 @@
     "deploy": "clasp push",
     "pretest": "npm run lint",
     "test": "jest",
-    "posttest": "npm run compile",
+    "posttest": "npm run fix",
     "lint": "gts lint",
     "fix": "gts fix",
     "compile": "tsc --pretty --noEmitOnError",
@@ -18,16 +18,10 @@
     "test-only": "jest --silent=true -o",
     "prepare": "husky install"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "npm run compile"
-    }
-  },
   "lint-staged": {
     "*.@(ts|tsx)": [
-      "npm run lint",
-      "npm run fix"
+      "npm test",
+      "npm run compile"
     ]
   },
   "keywords": [],

@@ -160,9 +160,6 @@ dist
 # TernJS port file
 .tern-port
 
-# husky 
-.husky
-
 # Google App Script Clasp
 build
 .clasp.json
