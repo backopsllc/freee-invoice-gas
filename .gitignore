@@ -160,6 +160,9 @@ dist
 # TernJS port file
 .tern-port
 
+# package-lock
+package-lock.json
+
 # Google App Script Clasp
 build
 .clasp.json
