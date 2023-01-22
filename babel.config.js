@@ -15,5 +15,8 @@ module.exports = {
     // Polyfills the runtime needed for async/await, generators, and friends
     // https://babeljs.io/docs/en/babel-plugin-transform-runtime
     [require('@babel/plugin-transform-runtime').default],
+    // https://babeljs.io/docs/en/babel-plugin-proposal-decorators
+    ['@babel/plugin-proposal-decorators', {version: 'legacy'}],
+    '@babel/plugin-proposal-class-properties',
   ],
 };
